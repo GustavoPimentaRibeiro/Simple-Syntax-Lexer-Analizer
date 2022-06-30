@@ -1,0 +1,160 @@
+/*Documentação: http://www2.cs.tum.edu/projects/cup/*/
+import java_cup.runtime.*;
+
+parser code {:
+    // conectar esse parser ao scanner!
+    Scanner s;
+    Parser(Scanner s){ this.s=s; }
+
+    // tabela de símbolos
+    java.util.Map<String, Integer> simbolos = new java.util.HashMap<String, Integer>();
+:}
+
+/* conectar esse parser ao scanner! */
+init with {:  :};
+scan with {: return s.next_token(); :};
+
+/* Terminais */
+terminal       	HASH, INCLUDE, LIB, CONST, ID, INTEIRO, REAL, DREAL, CARACTER, ABREP, FECHAP, ABRECOL, FECHACOL,
+				ABRECHA, FECHACHA, RETURN, PV, IGUAL, MAIS, MENOS, VEZES, DIVIDIR, MOD, MAIOR, MENOR, MAIORI,
+				MENORI, IGUALI, DIFERENTE, NEGACAO, OU, E, ENQUANTO, PARA, MAISMAIS, MENOSMENOS, VIRGULA,
+				ABREASPASS, FECHAASPASS, ZERO, VALOR, NUM, SE, SENAO, INPUT, OUTPUT, ABREASPASD, FECHAASPASD,
+				PULALINHA, TABULACAO, ESPACAMENTO, PRINCIPAL, PONTO;
+
+/* Não terminais */
+non terminal   	inicio, inicio1, nconst, comando, declaracao, declaracao1, tipo, listaids, laco,
+				listaids1, listaids2, listaids3, comandos, atrib, atrib1, expressoes, expressaoarit,
+				expressaoarit1, idnum, expressaobool, expressaobool1, expressaobool2, incremento,
+				tiposincremento, expressaoboolop, expressaoboolopi, palavra, condicional, condicional1,
+				leitura, escrita, escrita1;
+
+start with inicio;
+
+
+inicio ::= HASH INCLUDE LIB inicio1
+;
+
+inicio1 ::=	INTEIRO PRINCIPAL ABREP FECHAP ABRECHA comando RETURN ZERO PV FECHACHA |
+HASH CONST ID VALOR nconst INTEIRO PRINCIPAL ABREP FECHAP ABRECHA comando RETURN ZERO PV FECHACHA
+;
+
+nconst ::= HASH CONST ID VALOR nconst | 
+;
+
+comando ::= declaracao comandos | 
+;
+
+declaracao ::= tipo listaids PV declaracao1
+;
+
+declaracao1 ::=	declaracao | 
+;
+
+tipo ::= INTEIRO |
+REAL |
+DREAL |
+CARACTER
+;
+
+listaids ::= ID listaids1
+;
+
+listaids1 ::= ABRECOL NUM FECHACOL listaids2 |
+VIRGULA listaids | 
+;
+
+listaids2 ::= ABRECOL NUM FECHACOL listaids3 |
+VIRGULA listaids | 
+;
+
+listaids3 ::= VIRGULA listaids | 
+;
+
+comandos ::= atrib comando |
+laco comando |
+condicional comando |
+leitura comando |
+escrita comando
+;
+
+atrib ::= ID IGUAL atrib1
+;
+
+atrib1 ::= expressoes |
+NUM |
+ID |
+ABREASPASS palavra FECHAASPASS
+;
+
+palavra ::= VALOR | 
+;
+
+expressoes ::= expressaoarit |
+expressaobool
+;
+
+expressaoarit ::= idnum expressaoarit1 |
+MENOS idnum |
+ABREP expressaoarit FECHAP
+;
+
+expressaoarit1 ::= MAIS expressaoarit |
+MENOS expressaoarit |
+VEZES expressaoarit |
+DIVIDIR expressaoarit |
+MOD expressaoarit | 
+;
+
+idnum ::= ID |
+NUM
+;
+
+expressaobool ::= expressoes expressaobool1 |
+ABREP expressoes FECHAP |
+NEGACAO expressaobool2
+;
+
+expressaobool1 ::= expressaoboolop expressoes | 
+;
+
+expressaobool2 ::= expressoes |
+ABREP expressoes FECHAP
+;
+
+expressaoboolop ::=	MAIOR expressaoboolopi |
+MENOR expressaoboolopi |
+IGUAL expressaoboolopi |
+NEGACAO expressaoboolopi |
+E |
+OU
+;
+
+expressaoboolopi ::= IGUAL | 
+;
+
+laco ::= ENQUANTO ABREP expressaobool FECHAP ABRECHA comandos FECHACHA |
+PARA ABREP ID IGUAL NUM PV expressaobool PV incremento FECHAP ABRECHA comandos  FECHACHA
+;
+
+incremento ::= ID tiposincremento
+;
+
+tiposincremento ::=	MENOSMENOS |
+MAISMAIS
+;
+
+condicional ::=	SE ABREP expressaobool FECHAP ABRECHA comandos FECHACHA condicional1
+;
+
+condicional1 ::= SENAO ABRECHA comandos FECHACHA | 
+;
+
+leitura ::=	INPUT ABREP ID FECHAP PV
+;
+
+escrita ::=	OUTPUT ABREP escrita1 FECHAP PV
+;
+
+escrita1 ::= listaids |
+ABREASPASD VALOR FECHAASPASD
+;
